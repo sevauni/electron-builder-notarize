@@ -2,7 +2,7 @@
 
 > Notarize Electron applications using electron-builder
 
-For more details regarding the options and functionality: https://github.com/electron/electron-notarize
+For more details regarding the options and functionality: https://github.com/electron/@electron/notarize
 
 ## Install
 
@@ -69,7 +69,7 @@ Authentication methods:
 
 ### Multiple Teams
 
-If your developer account is a member of multiple teams or organizations, you might see an error. In this case, you need to provide your [Team Short Name](https://github.com/electron/electron-notarize#notes-on-your-team-short-name) as an environment variable:
+If your developer account is a member of multiple teams or organizations, you might see an error. In this case, you need to provide your [Team Short Name](https://github.com/electron/@electron/notarize#notes-on-your-team-short-name) as an environment variable:
 
 ```sh
 export TEAM_SHORT_NAME=XXXXXXXXX
@@ -79,7 +79,7 @@ export TEAM_SHORT_NAME=XXXXXXXXX
 
 This package is inspired by this [article](https://medium.com/@TwitterArchiveEraser/notarize-electron-apps-7a5f988406db)
 
-The library used for notarization: https://github.com/electron/electron-notarize
+The library used for notarization: https://github.com/electron/@electron/notarize
 
 ## License
 

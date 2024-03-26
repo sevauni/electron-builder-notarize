@@ -1,15 +1,15 @@
-'use strict';
+"use strict";
 
-require('dotenv').config();
+require("dotenv").config();
 
-const path = require('path');
-const fs = require('fs');
-const readPkgUp = require('read-pkg-up');
-const {notarize} = require('electron-notarize');
-const yaml = require('js-yaml');
+const path = require("path");
+const fs = require("fs");
+const readPkgUp = require("read-pkg-up");
+const { notarize } = require("@electron/notarize");
+const yaml = require("js-yaml");
 // eslint-disable-next-line import/no-unresolved
-const util = require('builder-util');
-const getAuthCreds = require('./validate');
+const util = require("builder-util");
+const getAuthCreds = require("./validate");
 
 const isEnvTrue = value => {
 	// eslint-disable-next-line no-eq-null, eqeqeq
@@ -17,11 +17,11 @@ const isEnvTrue = value => {
 		value = value.trim();
 	}
 
-	return value === 'true' || value === '' || value === '1';
+	return value === "true" || value === "" || value === "1";
 };
 
 const getAppId = params => {
-	const {packager, outDir} = params;
+	const { packager, outDir } = params;
 
 	// Try getting appId from the packager object
 	const config = packager.info._configuration;
@@ -32,28 +32,31 @@ const getAppId = params => {
 	}
 
 	// Try getting appId from the `builder-effective-config.yml`
-	const effectiveConfigPath = path.join(outDir, 'builder-effective-config.yaml');
+	const effectiveConfigPath = path.join(
+		outDir,
+		"builder-effective-config.yaml"
+	);
 	// This doesn't exist in CI
 	if (fs.existsSync(effectiveConfigPath)) {
 		const buildConfig = fs.readFileSync(effectiveConfigPath);
-		const {appId} = yaml.safeLoad(buildConfig);
+		const { appId } = yaml.safeLoad(buildConfig);
 		return appId;
 	}
 
 	// Try getting appId from `package.json` or from an env var
-	const {packageJson} = readPkgUp.sync();
+	const { packageJson } = readPkgUp.sync();
 	return (packageJson.build && packageJson.build.appId) || process.env.APP_ID;
 };
 
 module.exports = async params => {
-	if (params.electronPlatformName !== 'darwin') {
+	if (params.electronPlatformName !== "darwin") {
 		return;
 	}
 
 	// https://github.com/electron-userland/electron-builder/blob/c11fa1f1033aeb7c378856d7db93369282d363f5/packages/app-builder-lib/src/codeSign/macCodeSign.ts#L22-L49
 	if (util.isPullRequest()) {
 		if (!isEnvTrue(process.env.CSC_FOR_PULL_REQUEST)) {
-			console.log('Skipping notarizing, since app was not signed.');
+			console.log("Skipping notarizing, since app was not signed.");
 			return;
 		}
 	}
@@ -70,10 +73,13 @@ module.exports = async params => {
 	const appId = getAppId(params);
 
 	if (!appId) {
-		throw new Error('`appId` was not found');
+		throw new Error("`appId` was not found");
 	}
 
-	const appPath = path.join(params.appOutDir, `${params.packager.appInfo.productFilename}.app`);
+	const appPath = path.join(
+		params.appOutDir,
+		`${params.packager.appInfo.productFilename}.app`
+	);
 
 	const notarizeOptions = {
 		...authInfo,
@@ -90,14 +96,19 @@ module.exports = async params => {
 			console.log(`🌟 Notarizing ${appId} successfully !`);
 		}
 	} catch (error) {
-		const error1048Str = 'You must first sign the relevant contracts online. (1048)';
+		const error1048Str =
+			"You must first sign the relevant contracts online. (1048)";
 
 		if (String(error).includes(error1048Str)) {
-			throw new Error('📃 Error(1048): You must first sign the relevant contracts online');
+			throw new Error(
+				"📃 Error(1048): You must first sign the relevant contracts online"
+			);
 		}
 
-		fs.writeFileSync('notarization-error.log', error.message);
+		fs.writeFileSync("notarization-error.log", error.message);
 
-		throw new Error('❌ Notarization Error,please check notarization-error.log');
+		throw new Error(
+			"❌ Notarization Error,please check notarization-error.log"
+		);
 	}
 };
