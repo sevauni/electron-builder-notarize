@@ -20,13 +20,6 @@
 		"validate.js",
 		"entitlements.mac.inherit.plist"
 	],
-	"keywords": [
-		"electron",
-		"notarize",
-		"apple",
-		"id",
-		"builder"
-	],
 	"dependencies": {
 		"@electron/notarize": "^2.3.0",
 		"dotenv": "^8.2.0",
