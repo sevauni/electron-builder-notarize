@@ -1,8 +1,8 @@
-const {isNotaryToolAvailable} = require('@electron/notarize/lib/notarytool');
+const { isNotaryToolAvailable } = require("@electron/notarize/lib/notarytool");
 const {
 	validateNotaryToolAuthorizationArgs,
-	validateLegacyAuthorizationArgs
-} = require('@electron/notarize/lib/validate-args');
+	validateLegacyAuthorizationArgs,
+} = require("@electron/notarize/lib/validate-args");
 
 function getAuthInfo() {
 	const {
@@ -16,7 +16,7 @@ function getAuthInfo() {
 		TEAM_SHORT_NAME: teamShortName,
 		APPLE_TEAM_ID: teamId,
 		APPLE_KEYCHAIN: keychain,
-		APPLE_KEYCHAIN_PROFILE: keychainProfile
+		APPLE_KEYCHAIN_PROFILE: keychainProfile,
 	} = process.env;
 
 	return {
@@ -30,37 +30,41 @@ function getAuthInfo() {
 		keychain,
 		keychainProfile,
 		legacyApiIssuer,
-		legacyApiKey
+		legacyApiKey,
 	};
 }
 
 module.exports = async () => {
 	const options = getAuthInfo();
 
-	if (!options.legacyApiIssuer && !options.legacyApiKey && await isNotaryToolAvailable()) {
+	if (
+		!options.legacyApiIssuer &&
+		!options.legacyApiKey &&
+		(await isNotaryToolAvailable())
+	) {
 		try {
 			const creds = validateNotaryToolAuthorizationArgs(options);
 			return {
 				...creds,
-				tool: 'notarytool'
+				tool: "notarytool",
 			};
-		} catch (e ) {
-			throw new Error('Notarization error!',e);
+		} catch (e) {
+			throw new Error("Notarization error!", e);
 		}
 	} else {
-		console.log('notarytool not found, trying legacy.');
+		console.log("notarytool not found, trying legacy.");
 	}
 
 	const creds = validateLegacyAuthorizationArgs({
 		...options,
 		// Backwards compatibility
 		appleApiKey: options.appleApiKey || options.legacyApiKey,
-		appleApiIssuer: options.appleApiIssuer || options.legacyApiIssuer
+		appleApiIssuer: options.appleApiIssuer || options.legacyApiIssuer,
 	});
 
 	return {
 		...creds,
-		tool: 'legacy',
-		ascProvider: options.teamShortName
+		tool: "legacy",
+		ascProvider: options.teamShortName,
 	};
 };
